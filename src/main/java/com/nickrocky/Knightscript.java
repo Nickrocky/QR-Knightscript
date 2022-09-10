@@ -1,5 +1,7 @@
 package com.nickrocky;
 
+import com.nickrocky.kqr.KQRWriter;
+import com.nickrocky.util.EncodingSchema;
 import lombok.SneakyThrows;
 
 import java.util.Scanner;
@@ -133,9 +135,8 @@ public class Knightscript {
     }*/
 
     public static void main(String... margs){
-        int size;
-        Scanner scanner = new Scanner(System.in);
-        size = scanner.nextInt();
+        KQRWriter kqrWriter = new KQRWriter();
+        kqrWriter.create("Test", EncodingSchema.BYTE, new byte[]{0,1,2,3,4,5,6,7,8,9});
 
     }
 
