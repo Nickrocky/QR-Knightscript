@@ -1,4 +1,4 @@
-package com.nickrocky.kqr;
+package com.nickrocky;
 
 public class KQRReader {
 }

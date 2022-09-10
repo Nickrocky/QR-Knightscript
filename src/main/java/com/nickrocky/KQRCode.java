@@ -1,6 +1,4 @@
-package com.nickrocky.kqr;
-
-import com.nickrocky.util.Packages;
+package com.nickrocky;
 
 
 import java.awt.*;
@@ -8,7 +6,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.nickrocky.util.Packages.*;
+import static com.nickrocky.Packages.*;
 
 public class KQRCode {
 

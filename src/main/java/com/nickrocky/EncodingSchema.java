@@ -1,4 +1,4 @@
-package com.nickrocky.util;
+package com.nickrocky;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

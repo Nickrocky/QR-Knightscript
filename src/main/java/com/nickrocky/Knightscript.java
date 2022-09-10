@@ -1,13 +1,5 @@
 package com.nickrocky;
 
-import com.nickrocky.kqr.KQRWriter;
-import com.nickrocky.util.EncodingSchema;
-import lombok.SneakyThrows;
-
-import java.util.Scanner;
-import java.util.zip.Deflater;
-import java.util.zip.Inflater;
-
 public class Knightscript {
 
     private static String menu = "Served on locally sourced artisan breads. Add bacon or a fried egg to any sandwich\n" +
@@ -134,9 +126,68 @@ public class Knightscript {
 
     }*/
 
+    private static final String test = "Scripts.com\n" +
+            "Bee Movie\n" +
+            "By Jerry Seinfeld\n" +
+            "\n" +
+            "NARRATOR:\n" +
+            "(Black screen with text; The sound of buzzing bees can be heard)\n" +
+            "According to all known laws\n" +
+            "of aviation,\n" +
+            " :\n" +
+            "there is no way a bee\n" +
+            "should be able to fly.\n" +
+            " :\n" +
+            "Its wings are too small to get\n" +
+            "its fat little body off the ground.\n" +
+            " :\n" +
+            "The bee, of course, flies anyway\n" +
+            " :\n" +
+            "because bees don't care\n" +
+            "what humans think is impossible.\n" +
+            "BARRY BENSON:\n" +
+            "(Barry is picking out a shirt)\n" +
+            "Yellow, black. Yellow, black.\n" +
+            "Yellow, black. Yellow, black.\n" +
+            " :\n" +
+            "Ooh, black and yellow!\n" +
+            "Let's shake it up a little.\n" +
+            "JANET BENSON:\n" +
+            "Barry! Breakfast is ready!\n" +
+            "BARRY:\n" +
+            "Coming!\n" +
+            " :\n" +
+            "Hang on a second.\n" +
+            "(Barry uses his antenna like a phone)\n" +
+            " :\n" +
+            "Hello?\n" +
+            "ADAM FLAYMAN:\n" +
+            "\n" +
+            "(Through phone)\n" +
+            "- Barry?\n" +
+            "BARRY:\n" +
+            "- Adam?\n" +
+            "ADAM:\n" +
+            "- Can you believe this is happening?\n" +
+            "BARRY:\n" +
+            "- I can't. I'll pick you up.\n" +
+            "(Barry flies down the stairs)\n" +
+            " :\n" +
+            "MARTIN BENSON:\n" +
+            "Looking sharp.\n" +
+            "JANET:\n" +
+            "Use the stairs. Your father\n" +
+            "paid good money for those.\n" +
+            "BARRY:\n" +
+            "Sorry. I'm excited.\n" +
+            "MARTIN:\n" +
+            "Here's the graduate.\n" +
+            "We're very proud of you, son.\n" +
+            " :";
+
     public static void main(String... margs){
         KQRWriter kqrWriter = new KQRWriter();
-        kqrWriter.create("Test", EncodingSchema.BYTE, new byte[]{0,1,2,3,4,5,6,7,8,9});
+        kqrWriter.create("Test", EncodingSchema.BYTE, test.getBytes());
 
     }
 

@@ -1,4 +1,4 @@
-package com.nickrocky.util;
+package com.nickrocky;
 
 public class KQRUtil {
 

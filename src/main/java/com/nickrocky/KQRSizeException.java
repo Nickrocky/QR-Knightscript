@@ -1,4 +1,4 @@
-package com.nickrocky.kqr.exception;
+package com.nickrocky;
 
 public class KQRSizeException extends Exception{
     public KQRSizeException(int payloadSize){

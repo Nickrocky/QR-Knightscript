@@ -1,16 +1,15 @@
-package com.nickrocky.kqr;
+package com.nickrocky;
 
-import com.nickrocky.kqr.exception.KQRSizeException;
-import com.nickrocky.util.EncodingSchema;
-import com.nickrocky.util.KQRUtil;
 import lombok.SneakyThrows;
 
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
-import static com.nickrocky.util.Packages.*;
+import static com.nickrocky.Packages.*;
 
 /**
  * Currently its 1 pixel per package, in the future it would be nice to make it allow for more than one pixel shouldnt be awful either
@@ -32,9 +31,19 @@ public class KQRWriter {
         int qrCodeSize = KQRUtil.suggestSize(payload) + (2 * MARKER_AND_QUIET_ZONE); //This should be the distance across the top, but since they are squares we use it for both measurements
         BufferedImage qrImage = new BufferedImage(qrCodeSize, qrCodeSize, BufferedImage.TYPE_INT_RGB);
         applyBaseline(qrImage, qrCodeSize);
-        applyData(qrImage, qrCodeSize, EncodingSchema.BYTE, payload);
+        List<Packages> packs = new ArrayList<>();
+        for(byte b : payload){
+            var packages = CharacterSet.getPackageFromByte(b);
+            packs.add(packages[0]);
+            packs.add(packages[1]);
+        }
+        applyData(qrImage, qrCodeSize, EncodingSchema.BYTE, packs);
         File glyphExport = new File(fileName+".png");
         ImageIO.write(qrImage, "png", glyphExport);
+    }
+
+    private void createAppQRCode(String fileName, byte[] payload){
+
     }
 
     private void applyBaseline(BufferedImage image, int glyphSize){
@@ -155,7 +164,7 @@ public class KQRWriter {
         //That should be the end of the basic 'always here' glyph components
     }
 
-    private void applyData(BufferedImage image, int glyphSize, EncodingSchema schema, byte[] payload){
+    private void applyData(BufferedImage image, int glyphSize, EncodingSchema schema, List<Packages> payload){
 
         //Encode the encoding data and the template indicator
         /**
@@ -182,7 +191,40 @@ public class KQRWriter {
         image.setRGB(glyphSize-10, 0, encodingMSBpixel); //Left side of Yellow
         image.setRGB(glyphSize-10, 1, encodingLSBpixel); //Left side of Yellow
 
+
         //-- End Encoding Type stuff
+
+        int DATA_INDEX = 0;
+
+        //-- Start Stamping Zone 1 (Big Bottom Area)
+
+        int LOWER_BOTTOM_HARD_X = 10; //Cannot go past
+        int LOWER_BOTTOM_HARD_Y = 10;
+
+        int x = glyphSize-1,y = glyphSize-1;
+        for(Packages packages : payload){
+            System.out.println("Bruh " + x + " " +y + " Color " + packages.name());
+            image.setRGB(x, y, (packages.getRGBColor().getRed()<<16 | packages.getRGBColor().getGreen()<<8 | packages.getRGBColor().getBlue()));
+            DATA_INDEX++;
+            if(x == LOWER_BOTTOM_HARD_X && y == LOWER_BOTTOM_HARD_Y) break;
+            if(x == LOWER_BOTTOM_HARD_X){
+                y--;
+                x = (glyphSize-1);
+                continue;
+            }
+            x--;
+        }
+
+        //-- End Stamping Zone 1
+
+        //-- Start Stamping Zone 2 (Top)
+
+        int startingPointZone2 = glyphSize - (MARKER_AND_QUIET_ZONE-2);
+        
+
+        //final int TOP_HARD_X = 10
+
+        //for(int i =)
 
     }
 
