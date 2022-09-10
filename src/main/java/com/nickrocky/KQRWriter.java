@@ -8,6 +8,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.Deflater;
 
 import static com.nickrocky.Packages.*;
 
@@ -22,22 +23,60 @@ public class KQRWriter {
         switch (schema){
             //Essentially dumping bytes into a qr code
             case BYTE -> createByteQRCode(fileName, payload);
+            //case BYTE_COMPRESSED -> createByteQRCode(fileName, payload, true);
         }
     }
 
-    @SneakyThrows
     private void createByteQRCode(String fileName, byte[] payload){
+        createByteQRCode(fileName, payload, false);
+    }
+
+    @SneakyThrows
+    private void createByteQRCode(String fileName, byte[] payload, boolean useCompression){
         if(KQRUtil.validate(payload)) throw new KQRSizeException(payload.length);
         int qrCodeSize = KQRUtil.suggestSize(payload) + (2 * MARKER_AND_QUIET_ZONE); //This should be the distance across the top, but since they are squares we use it for both measurements
         BufferedImage qrImage = new BufferedImage(qrCodeSize, qrCodeSize, BufferedImage.TYPE_INT_RGB);
         applyBaseline(qrImage, qrCodeSize);
         List<Packages> packs = new ArrayList<>();
-        for(byte b : payload){
-            var packages = CharacterSet.getPackageFromByte(b);
+        byte[] correctedPayload = null;
+        if(useCompression){
+            byte[] buffer = new byte[9600];
+            Deflater compressor = new Deflater();
+            compressor.setInput(payload);
+            compressor.finish();
+            int size = compressor.deflate(buffer);
+            compressor.end();
+
+            Deflater somethingElse = new Deflater();
+            somethingElse.setInput(payload);
+            somethingElse.finish();
+            byte[] realBuffer = new byte[size];
+            somethingElse.deflate(realBuffer);
+            somethingElse.end();
+            correctedPayload = realBuffer;
+
+        }else{
+            correctedPayload = payload;
+        }
+
+        for(byte b : correctedPayload){
+            var packages = new Packages[2];
+            System.out.println("Something Fired!");
+            if(useCompression){
+                System.out.println("In here! " + (byte) (((int) b) + 128));
+                packages = CharacterSet.getPackageFromByte((byte) (((int) b) + 128));
+            }else{
+                packages = CharacterSet.getPackageFromByte(b);
+            }
+
             packs.add(packages[0]);
             packs.add(packages[1]);
         }
-        applyData(qrImage, qrCodeSize, EncodingSchema.BYTE, packs);
+        if(useCompression){
+            //applyData(qrImage, qrCodeSize, EncodingSchema.BYTE_COMPRESSED, packs);
+        }else{
+            //applyData(qrImage, qrCodeSize, EncodingSchema.BYTE, packs);
+        }
         File glyphExport = new File(fileName+".png");
         ImageIO.write(qrImage, "png", glyphExport);
     }
@@ -219,12 +258,38 @@ public class KQRWriter {
 
         //-- Start Stamping Zone 2 (Top)
 
-        int startingPointZone2 = glyphSize - (MARKER_AND_QUIET_ZONE-2);
-        
+        int startingPointZone2X = glyphSize - (MARKER_AND_QUIET_ZONE+2);
+        int startingPointZone2Y = 8;
 
-        //final int TOP_HARD_X = 10
+        for(int i = DATA_INDEX; i < payload.size(); i++){
+            System.out.println("X : " + startingPointZone2X + " Y " + startingPointZone2Y + " " + payload.get(i).name());
+            image.setRGB(startingPointZone2X, startingPointZone2Y, (payload.get(i).getRGBColor().getRed()<<16 | payload.get(i).getRGBColor().getGreen()<<8 | payload.get(i).getRGBColor().getBlue()));
+            DATA_INDEX++;
+            if(startingPointZone2X == 10 && startingPointZone2Y == 0) break;
+            if(startingPointZone2X == 10){
+                startingPointZone2Y--;
+                startingPointZone2X = glyphSize - (MARKER_AND_QUIET_ZONE + 2);
+                continue;
+            }
+            startingPointZone2X--;
+        }
 
-        //for(int i =)
+        //-- Start Zone 3 Side
+        int startingPointZone3X = 9;
+        int startingPointZone3Y = 13;
+        for(int i = DATA_INDEX; i < payload.size(); i++){
+            image.setRGB(startingPointZone3X, startingPointZone3Y, (payload.get(i).getRGBColor().getRed()<<16 | payload.get(i).getRGBColor().getGreen()<<8 | payload.get(i).getRGBColor().getBlue()));
+            if(startingPointZone3X == 0 && startingPointZone3Y == 10) break;
+            if(startingPointZone3X == 0){
+                startingPointZone3Y--;
+                startingPointZone3X = 9;
+                continue;
+            }
+            startingPointZone3X--;
+
+        }
+        System.out.println("Packages " + payload.size());
+
 
     }
 

@@ -1,6 +1,8 @@
 package com.nickrocky;
 
 
+import lombok.Getter;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -16,7 +18,7 @@ public class KQRCode {
     DARK_MAGENTA_REFERENCE, DARK_CYAN_REFERENCE, DARK_YELLOW_REFERENCE, GRAY_REFERENCE;
 
     private Packages[][] colorInput;
-    private List<Packages> payload;
+    @Getter private List<Packages> payload;
 
 
     public KQRCode(BufferedImage croppedImage, int height, int width){
@@ -45,8 +47,62 @@ public class KQRCode {
         this.height = height;
         this.width = width;
 
-        payload = readInput(croppedImage);
+        payload = readInPackages(croppedImage);
 
+    }
+
+    private List<Packages> readInPackages(BufferedImage image){
+        List<Packages> data = new ArrayList<>();
+
+        //final int MARKER_AND_QUIET_SIZE = 9;
+
+        //final int size = width-(MARKER_AND_QUIET_SIZE*2);
+
+        int y = height-1;
+        //Zone 1 reading
+        for(int x = width-1; x > 9; x--){
+            System.out.println("Zone 1 " + x + " " + y);
+            Color color = new Color(image.getRGB(x,y));
+            Packages p = convertToPackage(rgbToCmyk(color));
+            data.add(p);
+            if(x == 10 && y == 10) break;
+            if(x == 10){
+                y--;
+                x = (width-1);
+                continue;
+            }
+        }
+        y = height-10;
+        //Zone 2 reading
+        for(int x = (width-10); x > 10; x--){
+            System.out.println("Zone 2 " + x + " " + y);
+            Color color = new Color(image.getRGB(x,y));
+            Packages p = convertToPackage(rgbToCmyk(color));
+            data.add(p);
+            if(x == 10 && y == 10) break;
+            if(x == 10){
+                y--;
+                x = 10;
+                continue;
+            }
+        }
+
+        //Zone 3 reading
+
+        for(int x = width-9; x > 10; x--){
+            System.out.println("Zone 3");
+            Color color = new Color(image.getRGB(x,y));
+            Packages p = convertToPackage(rgbToCmyk(color));
+            data.add(p);
+            if(x == 10 && y == 0) break;
+            if(x == 10){
+                y--;
+                x = (width-9);
+                continue;
+            }
+        }
+        System.out.println("Something" +data.size());
+    return data;
     }
 
 

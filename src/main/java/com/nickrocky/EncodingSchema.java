@@ -16,6 +16,7 @@ public enum EncodingSchema {
     RESERVED(Packages.WHITE, Packages.WHITE), //0000 0000
 
     BYTE(Packages.WHITE, Packages.CYAN), //0000 1000 CYAN
+    BYTE_COMPRESSED(Packages.DARK_CYAN, Packages.CYAN), //1001 1000 - DISABLED
     /**
      * All other values will remain unassigned until we actually need them
      * */

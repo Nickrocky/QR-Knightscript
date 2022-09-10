@@ -2,6 +2,7 @@ package com.nickrocky;
 
 import static com.nickrocky.Packages.*;
 import lombok.Getter;
+import lombok.SneakyThrows;
 
 /**
  * Enum from my project at Hackabull2022
@@ -222,8 +223,12 @@ public enum CharacterSet {
     //Primary LSB, Secondary MSB
     public static Packages[] getPackageFromByte(byte b){
         for(CharacterSet character : CharacterSet.values()){
-            if(character.bVal == b) return new Packages[]{character.primary, character.secondary};
+            if(character.bVal == b){
+                System.out.println("The Char found was! " + character.name());
+                return new Packages[]{character.primary, character.secondary};
+            }
         }
+        System.out.println("This character was NOT found!" + "{ " + b + " }");
         return new Packages[]{UNKNOWN.getPrimary(), UNKNOWN.getSecondary()};
     }
 
@@ -235,6 +240,17 @@ public enum CharacterSet {
             }
         }
         return null;
+    }
+
+    @SneakyThrows
+    public static byte getByteFromPackages(Packages primary, Packages secondary){
+        for(CharacterSet characterSet : CharacterSet.values()){
+            if(primary == characterSet.getPrimary() && secondary == characterSet.getSecondary()){
+                return characterSet.getBVal();
+            }
+        }
+        return UNKNOWN.getBVal();
+        //throw new Exception("Bruh");
     }
 
     public static String getFromPackage(Packages primary, Packages secondary){
