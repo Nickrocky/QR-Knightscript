@@ -137,7 +137,7 @@ public class Knightscript {
     @SneakyThrows
     public static void main(String... margs){
         KQRWriter kqrWriter = new KQRWriter();
-        kqrWriter.create("Test2", EncodingSchema.BYTE, test.getBytes());
+        kqrWriter.create("Test", EncodingSchema.BYTE, test.getBytes());
         //kqrWriter.create("Test", EncodingSchema.BYTE_COMPRESSED, test.getBytes());
 
         BufferedImage image = ImageIO.read(new File("Test.png"));

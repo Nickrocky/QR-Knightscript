@@ -75,7 +75,7 @@ public class KQRWriter {
         if(useCompression){
             //applyData(qrImage, qrCodeSize, EncodingSchema.BYTE_COMPRESSED, packs);
         }else{
-            //applyData(qrImage, qrCodeSize, EncodingSchema.BYTE, packs);
+            applyData(qrImage, qrCodeSize, EncodingSchema.BYTE, packs);
         }
         File glyphExport = new File(fileName+".png");
         ImageIO.write(qrImage, "png", glyphExport);

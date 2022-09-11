@@ -224,11 +224,11 @@ public enum CharacterSet {
     public static Packages[] getPackageFromByte(byte b){
         for(CharacterSet character : CharacterSet.values()){
             if(character.bVal == b){
-                System.out.println("The Char found was! " + character.name());
+                //System.out.println("The Char found was! " + character.name());
                 return new Packages[]{character.primary, character.secondary};
             }
         }
-        System.out.println("This character was NOT found!" + "{ " + b + " }");
+        //System.out.println("This character was NOT found!" + "{ " + b + " }");
         return new Packages[]{UNKNOWN.getPrimary(), UNKNOWN.getSecondary()};
     }
 

@@ -61,7 +61,7 @@ public class KQRCode {
         int y = height-1;
         //Zone 1 reading
         for(int x = width-1; x > 9; x--){
-            System.out.println("Zone 1 " + x + " " + y);
+            //System.out.println("Zone 1 " + x + " " + y);
             Color color = new Color(image.getRGB(x,y));
             Packages p = convertToPackage(rgbToCmyk(color));
             data.add(p);
@@ -72,14 +72,14 @@ public class KQRCode {
                 continue;
             }
         }
-        y = height-10;
+        y = 9;
         //Zone 2 reading
         for(int x = (width-10); x > 10; x--){
             System.out.println("Zone 2 " + x + " " + y);
             Color color = new Color(image.getRGB(x,y));
             Packages p = convertToPackage(rgbToCmyk(color));
             data.add(p);
-            if(x == 10 && y == 10) break;
+            if(x == 10 && y == 0) break;
             if(x == 10){
                 y--;
                 x = 10;
@@ -90,7 +90,7 @@ public class KQRCode {
         //Zone 3 reading
 
         for(int x = width-9; x > 10; x--){
-            System.out.println("Zone 3");
+            //System.out.println("Zone 3");
             Color color = new Color(image.getRGB(x,y));
             Packages p = convertToPackage(rgbToCmyk(color));
             data.add(p);
