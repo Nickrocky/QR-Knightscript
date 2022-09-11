@@ -28,11 +28,11 @@ public class KQRWriter {
     }
 
     private void createByteQRCode(String fileName, byte[] payload){
-        createByteQRCode(fileName, payload, false);
+        createByteQRCode(fileName, payload, false, 1);
     }
 
     @SneakyThrows
-    private void createByteQRCode(String fileName, byte[] payload, boolean useCompression){
+    private void createByteQRCode(String fileName, byte[] payload, boolean useCompression, long templateNumber){
         if(KQRUtil.validate(payload)) throw new KQRSizeException(payload.length);
         int qrCodeSize = KQRUtil.suggestSize(payload) + (2 * MARKER_AND_QUIET_ZONE); //This should be the distance across the top, but since they are squares we use it for both measurements
         BufferedImage qrImage = new BufferedImage(qrCodeSize, qrCodeSize, BufferedImage.TYPE_INT_RGB);
@@ -61,9 +61,7 @@ public class KQRWriter {
 
         for(byte b : correctedPayload){
             var packages = new Packages[2];
-            System.out.println("Something Fired!");
             if(useCompression){
-                System.out.println("In here! " + (byte) (((int) b) + 128));
                 packages = CharacterSet.getPackageFromByte((byte) (((int) b) + 128));
             }else{
                 packages = CharacterSet.getPackageFromByte(b);
@@ -75,7 +73,8 @@ public class KQRWriter {
         if(useCompression){
             //applyData(qrImage, qrCodeSize, EncodingSchema.BYTE_COMPRESSED, packs);
         }else{
-            applyData(qrImage, qrCodeSize, EncodingSchema.BYTE, packs);
+            System.out.println("Done!");
+            applyData(qrImage, qrCodeSize, EncodingSchema.BYTE, packs, templateNumber);
         }
         File glyphExport = new File(fileName+".png");
         ImageIO.write(qrImage, "png", glyphExport);
@@ -203,7 +202,7 @@ public class KQRWriter {
         //That should be the end of the basic 'always here' glyph components
     }
 
-    private void applyData(BufferedImage image, int glyphSize, EncodingSchema schema, List<Packages> payload){
+    private void applyData(BufferedImage image, int glyphSize, EncodingSchema schema, List<Packages> payload, long template){
 
         //Encode the encoding data and the template indicator
         /**
@@ -233,8 +232,62 @@ public class KQRWriter {
 
         //-- End Encoding Type stuff
 
-        int DATA_INDEX = 0;
 
+
+
+        byte[] templateNumberInBytes = new byte[8]; //bc a long is 8 bytes
+        for(int i = 7; i >= 0; i--){
+            templateNumberInBytes[i] = (byte)(template & 0xFF);
+            template >>= 8;
+        }
+        List<Packages> packs = new ArrayList<>();
+        for(byte b : templateNumberInBytes){
+            var temp = CharacterSet.getPackageFromByte(b);
+            packs.add(temp[0]);
+            packs.add(temp[1]);
+        }
+
+        int TEMPLATE_DATA_INDEX = 0;
+        //UGH yes ugly hardcoding but also these are always at fixed points relative to the markers
+        //--Start Template Encoding Number - MAGENTA
+        for(int x = 2; x < 9; x++){
+            image.setRGB(x,9, (payload.get(TEMPLATE_DATA_INDEX).getRGBColor().getRed()<<16 | payload.get(TEMPLATE_DATA_INDEX).getRGBColor().getGreen()<<8 | payload.get(TEMPLATE_DATA_INDEX).getRGBColor().getBlue()));
+            TEMPLATE_DATA_INDEX++;
+        }
+        for(int y = 8; y > 0; y--){
+            image.setRGB(9,y, (payload.get(TEMPLATE_DATA_INDEX).getRGBColor().getRed()<<16 | payload.get(TEMPLATE_DATA_INDEX).getRGBColor().getGreen()<<8 | payload.get(TEMPLATE_DATA_INDEX).getRGBColor().getBlue()));
+            TEMPLATE_DATA_INDEX++;
+        }
+        //--End Template Encoding Number - MAGENTA
+
+        /**
+         * These are effectively redundancy, they dont actually all encode different info, its just that
+         * template information is INCREDIBLY important, and without it you physically cannot finish reading the code
+         * as such its been encoded 3 times the idea is, even if someone tore it in half, maybe one of the encoding regions would
+         * survive, granted youll have bigger issues on your hands if you didnt use error correction to account for 50% data loss
+         * */
+        TEMPLATE_DATA_INDEX = 0;
+        //--Start Template Encoding Number - YELLOW
+        int templatex = glyphSize-MARKER_AND_QUIET_ZONE-1;
+        for(int y = 2; y < 9; y++){
+            image.setRGB(templatex,y, (payload.get(TEMPLATE_DATA_INDEX).getRGBColor().getRed()<<16 | payload.get(TEMPLATE_DATA_INDEX).getRGBColor().getGreen()<<8 | payload.get(TEMPLATE_DATA_INDEX).getRGBColor().getBlue()));
+            TEMPLATE_DATA_INDEX++;
+        }
+        for(int x = templatex+1; x < glyphSize-1; x++){
+            image.setRGB(x,MARKER_AND_QUIET_ZONE, (payload.get(TEMPLATE_DATA_INDEX).getRGBColor().getRed()<<16 | payload.get(TEMPLATE_DATA_INDEX).getRGBColor().getGreen()<<8 | payload.get(TEMPLATE_DATA_INDEX).getRGBColor().getBlue()));
+            TEMPLATE_DATA_INDEX++;
+        }
+        //--End Template Encoding Number - YELLOW
+
+        TEMPLATE_DATA_INDEX = 0;
+        //--Start Template Encoding Number - CYAN
+        for(int y = glyphSize-3; y > glyphSize-MARKER_AND_QUIET_ZONE-1; y--){
+            image.setRGB(9,y, (payload.get(TEMPLATE_DATA_INDEX).getRGBColor().getRed()<<16 | payload.get(TEMPLATE_DATA_INDEX).getRGBColor().getGreen()<<8 | payload.get(TEMPLATE_DATA_INDEX).getRGBColor().getBlue()));
+            TEMPLATE_DATA_INDEX++;
+        }
+
+
+        int DATA_INDEX = 0;
         //-- Start Stamping Zone 1 (Big Bottom Area)
 
         int LOWER_BOTTOM_HARD_X = 10; //Cannot go past
@@ -275,14 +328,14 @@ public class KQRWriter {
         }
 
         //-- Start Zone 3 Side
-        int startingPointZone3X = 9;
+        int startingPointZone3X = 8;
         int startingPointZone3Y = 13;
         for(int i = DATA_INDEX; i < payload.size(); i++){
             image.setRGB(startingPointZone3X, startingPointZone3Y, (payload.get(i).getRGBColor().getRed()<<16 | payload.get(i).getRGBColor().getGreen()<<8 | payload.get(i).getRGBColor().getBlue()));
             if(startingPointZone3X == 0 && startingPointZone3Y == 10) break;
             if(startingPointZone3X == 0){
                 startingPointZone3Y--;
-                startingPointZone3X = 9;
+                startingPointZone3X = 8;
                 continue;
             }
             startingPointZone3X--;
