@@ -8,7 +8,7 @@ import java.io.File;
 
 public class Knightscript {
 
-    private static String menu = "Served on locally sourced artisan breads. Add bacon or a fried egg to any sandwich\n" +
+    private static String test = "Served on locally sourced artisan breads. Add bacon or a fried egg to any sandwich\n" +
             "\n" +
             "TRUFFLE MELT\n" +
             "Havarti, truffle oil, arugula, fresh ground pepper\n" +
@@ -89,56 +89,12 @@ public class Knightscript {
             "Mac and Cheese\n" +
             "Housemade with three cheeses";
 
-    /*@SneakyThrows
-    public static void main(String... args){
-        byte[] input = menu.getBytes("UTF-8");
-        String inputString = new String(input);
-        System.out.println(inputString);
-        Deflater compressor = new Deflater();
-        compressor.setInput(input);
-        byte[] outputBuffer = new byte[3000]; //Bc if its more than this its not going into a qr-code
-        compressor.finish();
-
-        Deflater compressor2 = new Deflater();
-        compressor2.setInput(input);
-        compressor2.finish();
-        int realLen = compressor.deflate(outputBuffer);
-        compressor.end();
-        byte[] buffer = new byte[realLen];
-        compressor2.deflate(buffer);
-        compressor2.end();
-        String output1 = new String(outputBuffer);
-        String output2 = new String(buffer);
-
-        System.out.println("Input Len" + input.length);
-
-        System.out.println("Output Buffer No Filter: " + output1);
-        System.out.println("Output Buffer: " + output2);
-        System.out.println("Output Buffer Len: " + output2.getBytes().length);
-
-        Inflater decompresser = new Inflater();
-        decompresser.setInput(buffer, 0, buffer.length);
-        byte[] resultant = new byte[3000];
-
-        int probablyInputLen = decompresser.inflate(resultant);
-        byte[] resultant2 = new byte[probablyInputLen];
-        Inflater decompresser2 = new Inflater();
-        decompresser2.setInput(buffer, 0, buffer.length);
-        decompresser2.inflate(resultant2);
-
-        String thing = new String(resultant2);
-        System.out.println("Menu? " + thing);
-        System.out.println("What I got: " + probablyInputLen);
-
-    }*/
-
-    private static final String test = "There once was a man that had no fucks left to give and finally react came and killed him. The end";
 
     @SneakyThrows
     public static void main(String... margs){
         KQRWriter kqrWriter = new KQRWriter();
         kqrWriter.create("Test", EncodingSchema.BYTE, test.getBytes());
-        //kqrWriter.create("Test", EncodingSchema.BYTE_COMPRESSED, test.getBytes());
+
 
         BufferedImage image = ImageIO.read(new File("Test.png"));
         KQRCode code = new KQRCode(image, image.getHeight(), image.getWidth());
