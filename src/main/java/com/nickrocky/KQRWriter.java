@@ -285,7 +285,11 @@ public class KQRWriter {
             image.setRGB(9,y, (payload.get(TEMPLATE_DATA_INDEX).getRGBColor().getRed()<<16 | payload.get(TEMPLATE_DATA_INDEX).getRGBColor().getGreen()<<8 | payload.get(TEMPLATE_DATA_INDEX).getRGBColor().getBlue()));
             TEMPLATE_DATA_INDEX++;
         }
-
+        for(int x = 8; x > 0; x--){
+            image.setRGB(x,glyphSize-MARKER_AND_QUIET_ZONE-1, (payload.get(TEMPLATE_DATA_INDEX).getRGBColor().getRed()<<16 | payload.get(TEMPLATE_DATA_INDEX).getRGBColor().getGreen()<<8 | payload.get(TEMPLATE_DATA_INDEX).getRGBColor().getBlue()));
+            TEMPLATE_DATA_INDEX++;
+        }
+        //--End Template Encoding Number - CYAN
 
         int DATA_INDEX = 0;
         //-- Start Stamping Zone 1 (Big Bottom Area)

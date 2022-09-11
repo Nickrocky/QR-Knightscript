@@ -95,15 +95,6 @@ public class Knightscript {
         KQRWriter kqrWriter = new KQRWriter();
         kqrWriter.create("Test", EncodingSchema.BYTE, test.getBytes());
 
-
-        BufferedImage image = ImageIO.read(new File("Test.png"));
-        KQRCode code = new KQRCode(image, image.getHeight(), image.getWidth());
-        for(int i = 0; i < code.getPayload().size(); i+=2){
-              CharacterSet.getByteFromPackages(code.getPayload().get(i), code.getPayload().get(i+1));
-
-        }
-
-
     }
 
 }
